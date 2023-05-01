@@ -39,7 +39,7 @@ namespace WebApiTienda.Controllers
                 Token TokenUtil = new Token(Request.Headers, HttpContext);
                 ResponseLogin credentials = TokenUtil.CreateLogin(user);
 
-                return StatusCode(200, new ResponseApi<ResponseLogin>(credentials, "ok", "Usuario encontrado"));
+                return StatusCode(200, new ResponseApi<ResponseLogin>(credentials, "ok", "Usuario autenticado"));
 
             }
             catch (Exception e)
