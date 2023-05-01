@@ -5,11 +5,11 @@ namespace WebApiTienda.Utils
     {
         private string status;
         private string message;
-        private T data;
+        private T response;
 
         public ResponseApi(T data, string status, string message)
         {
-            this.data = data;
+            this.response = data;
             this.status = status;
             this.message = message;
         }
@@ -26,10 +26,10 @@ namespace WebApiTienda.Utils
             set { message = value; }
         }
 
-        public T Data
+        public T Response
         {
-            get { return data; }
-            set { data = value; }
+            get { return response; }
+            set { response = value; }
         }
     }
 
