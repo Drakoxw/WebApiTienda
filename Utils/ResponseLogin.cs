@@ -5,10 +5,10 @@
         private string username;
         private string role;
         private int id;
-        private int exp;
+        private long exp;
         private string token;
 
-        public ResponseLogin(string username, string role, int id, int exp, string token)
+        public ResponseLogin(string username, string role, int id, long exp, string token)
         {
             this.username = username;
             this.role = role;
@@ -34,7 +34,7 @@
             set {  id = value; } 
         }
 
-        public int Exp
+        public long Exp
         {
             get { return exp; }
             set { exp = value; }

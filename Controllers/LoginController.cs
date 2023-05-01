@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using WebApiTienda.Models;
 using WebApiTienda.Utils;
 
@@ -10,10 +9,12 @@ namespace WebApiTienda.Controllers
     public class LoginController : Controller
     {
         private readonly AppContextDB _context;
+        private readonly IConfiguration _config;
 
-        public LoginController(AppContextDB context)
+        public LoginController(AppContextDB context, IConfiguration config)
         {
             _context = context;
+            _config = config;
         }
 
         [HttpPost]
@@ -37,7 +38,7 @@ namespace WebApiTienda.Controllers
                     return NotFound(new ResponseApi<string>("", "error", "usuario o contraseña incorrectos"));
                 }
 
-                ResponseLogin credentials = new ResponseLogin(user.Nombre, user.Role, user.Id, 188984844, "Token 12234");
+                ResponseLogin credentials = new Token().CreateLogin(user);
 
                 return StatusCode(200, new ResponseApi<ResponseLogin>(credentials, "ok", "Usuario encontrado"));
 
