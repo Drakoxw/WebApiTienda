@@ -94,15 +94,16 @@ namespace WebApiTienda.Controllers
         {
             Token TokenUtil = new Token(Request.Headers, HttpContext);
             var dataToken = TokenUtil.GetDataToken();
+            Logs.SaveLog("Tratando de borrar el id " + id);
 
             if (TokenUtil.ValidarOrigen(dataToken.aud) == false)
             {
                 return StatusCode(401, new ResponseApi<string>("", "error", "Origen de token desconocido"));
             }
 
-            if (dataToken.isAdmin != false)
+            if (dataToken.isAdmin == false)
             {
-                return StatusCode(403, new ResponseApi<TokenInterface>(dataToken, "error", "No autorizado"));
+                return StatusCode(403, new ResponseApi<string>(dataToken.role, "error", "No autorizado"));
             }
 
             if (_context.Usuarios == null)

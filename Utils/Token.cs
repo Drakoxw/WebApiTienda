@@ -78,7 +78,8 @@ namespace WebApiTienda.Utils
 
         public bool ValidarOrigen(string audToken)
         {
-            return audToken != Aud();
+            // Logs.SaveLog(audToken + " - "+ Aud());
+            return audToken == Aud();
         }
 
         public TokenInterface? GetDataToken()
@@ -103,7 +104,7 @@ namespace WebApiTienda.Utils
                     exp      = Convert.ToInt64(userClaims.FirstOrDefault(c => c.Type == "exp")?.Value ?? ""),
                     iss      = Convert.ToString(userClaims.FirstOrDefault(c => c.Type == "iss")?.Value ?? ""),
                     aud      = Convert.ToString(userClaims.FirstOrDefault(c => c.Type == "aud")?.Value ?? ""),
-                    isAdmin  = roleToken == "SUPER-ADMIN" || roleToken == "SUPER-ADMIN",
+                    isAdmin  = roleToken == "SUPER-ADMIN" ? true : roleToken == "ADMIN",
                     isSuperAdmin  = roleToken == "SUPER-ADMIN"
                 };
                 return dataToken;
