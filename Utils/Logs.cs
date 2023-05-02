@@ -1,4 +1,7 @@
-﻿namespace WebApiTienda.Utils
+﻿using System;
+using System.Collections;
+
+namespace WebApiTienda.Utils
 {
     public class Logs
     {
@@ -9,12 +12,22 @@
             return routeBase;
         }
 
-        public static void SaveLog(string value)
+        //public static void EnvPrint()
+        //{
+        //    foreach (DictionaryEntry de in Environment.GetEnvironmentVariables())
+        //    {
+        //        Info(Convert.ToString(de.Key) + ":                  "+Convert.ToString(de.Value), false);
+        //    }
+        //    // ASPNETCORE_ENVIRONMENT:                  Development
+        //}
+
+
+        private static void Main(string value, string type)
         {
-            // [2023-03-16 10:14:49] qa.ERROR: Se detecto inconsitencias en la respuesta de Cifin  
-            string path = GetRoute() + "info.log";
+            string typeEnt = Convert.ToString(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "").ToUpper();
+            string path = GetRoute() + type + ".log";
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            string valueSave = "["+ date + "] QA.INFO: " + value;
+            string valueSave = "["+ date + "] " + typeEnt + "."+ type.ToUpper() +": " + value;
             if (!File.Exists(path))
             {
                 using (StreamWriter file = File.CreateText(path))
@@ -29,5 +42,54 @@
             }
 
         }
+
+        public static void Alert(string value, bool saveDB)
+        {
+            if (saveDB)
+            {
+                
+            } else
+            {
+                Main(value, "alert");
+            }
+
+        }
+        public static void Error(string value, bool saveDB)
+        {
+            if (saveDB)
+            {
+                
+            } else
+            {
+                Main(value, "error");
+            }
+
+        }
+
+        public static void Warning(string value, bool saveDB)
+        {
+            if (saveDB)
+            {
+                
+            } else
+            {
+                Main(value, "warning");
+            }
+
+        }
+
+        public static void Info(string value, bool saveDB)
+        {
+            if (saveDB)
+            {
+                
+            } else
+            {
+                Main(value, "info");
+            }
+
+        }
+
     }
+
 }
