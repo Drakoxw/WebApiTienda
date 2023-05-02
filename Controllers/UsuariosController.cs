@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiTienda.Models;
+using WebApiTienda.Models.Interfaces;
+using WebApiTienda.Utils;
 
 namespace WebApiTienda.Controllers
 {
     [Route("api/usuarios")]
     [ApiController]
+    [Authorize]
     public class UsuariosController : ControllerBase
     {
         private readonly AppContextDB _context;
@@ -21,30 +20,31 @@ namespace WebApiTienda.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UsuariosModel>>> GetUsuarios()
+        public async Task<ActionResult<List<UsuariosModel>>> GetUsuarios()
         {
-          if (_context.Usuarios == null)
-          {
-              return NotFound();
-          }
-            return await _context.Usuarios.ToListAsync();
+            if (_context.Usuarios == null)
+            {
+                return NoContent();
+            }
+            List<UsuariosModel> list = await _context.Usuarios.ToListAsync();
+            return StatusCode(200, new ResponseApi<List<UsuariosModel>>(list, "ok", "lista de usuarios"));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<UsuariosModel>> GetUsuariosModel(int id)
+        public async Task<ActionResult<ResponseApi<UsuariosModel>>> GetUsuariosModel(int id)
         {
-          if (_context.Usuarios == null)
-          {
-              return NotFound();
-          }
+            if (_context.Usuarios == null)
+            {
+                return StatusCode(400, new ResponseApi<string>("", "error", "No se encontro el usuario"));
+            }
             var usuariosModel = await _context.Usuarios.FindAsync(id);
 
             if (usuariosModel == null)
             {
-                return NotFound();
+                return StatusCode(400, new ResponseApi<string>("", "error", "No se encontro el usuario"));
             }
 
-            return usuariosModel;
+            return StatusCode(400, new ResponseApi<UsuariosModel>(usuariosModel, "ok", "Usuario encontrado"));
         }
 
         [HttpPut("{id}")]
@@ -52,7 +52,7 @@ namespace WebApiTienda.Controllers
         {
             if (id != usuariosModel.Id)
             {
-                return BadRequest();
+                return StatusCode(400, new ResponseApi<string>("", "error", "No se encontro el usuario"));
             }
 
             _context.Entry(usuariosModel).State = EntityState.Modified;
@@ -65,7 +65,7 @@ namespace WebApiTienda.Controllers
             {
                 if (!UsuariosModelExists(id))
                 {
-                    return NotFound();
+                    return StatusCode(400, new ResponseApi<string>("", "error", "No se encontro el usuario"));
                 }
                 else
                 {
@@ -77,30 +77,42 @@ namespace WebApiTienda.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<UsuariosModel>> PostUsuariosModel(UsuariosModel usuariosModel)
-        {
-          if (_context.Usuarios == null)
-          {
-              return Problem("Entity set 'AppContextDB.Usuarios'  is null.");
-          }
-            _context.Usuarios.Add(usuariosModel);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUsuariosModel", new { id = usuariosModel.Id }, usuariosModel);
-        }
-
-        // DELETE: api/Usuarios/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUsuariosModel(int id)
+        public async Task<ActionResult<ResponseApi<UsuariosModel>>> PostUsuariosModel(UsuariosModel usuariosModel)
         {
             if (_context.Usuarios == null)
             {
-                return NotFound();
+                return Problem("Entity set 'AppContextDB.Usuarios'  is null.");
+            }
+            _context.Usuarios.Add(usuariosModel);
+            await _context.SaveChangesAsync();
+
+            return StatusCode(201, new ResponseApi<UsuariosModel>(usuariosModel, "ok", "Usuario creado"));
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUsuariosModel(int id)
+        {
+            Token TokenUtil = new Token(Request.Headers, HttpContext);
+            var dataToken = TokenUtil.GetDataToken();
+
+            if (TokenUtil.ValidarOrigen(dataToken.aud) == false)
+            {
+                return StatusCode(401, new ResponseApi<string>("", "error", "Origen de token desconocido"));
+            }
+
+            if (dataToken.isAdmin != false)
+            {
+                return StatusCode(403, new ResponseApi<TokenInterface>(dataToken, "error", "No autorizado"));
+            }
+
+            if (_context.Usuarios == null)
+            {
+                return StatusCode(400, new ResponseApi<string>("", "error", "No se encontro el usuario")); ;
             }
             var usuariosModel = await _context.Usuarios.FindAsync(id);
             if (usuariosModel == null)
             {
-                return NotFound();
+                return StatusCode(400, new ResponseApi<string>("", "error", "No se encontro el usuario")); ;
             }
 
             _context.Usuarios.Remove(usuariosModel);
