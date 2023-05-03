@@ -1,15 +1,21 @@
-﻿using System;
-using System.Collections;
+﻿
+using WebApiTienda.Models;
 
 namespace WebApiTienda.Utils
 {
     public class Logs
+
     {
         private static string GetRoute()
         {
             string routeBase = AppDomain.CurrentDomain.BaseDirectory;
             routeBase = routeBase.Replace("bin\\Debug\\net6.0\\", "Statics\\Logs\\");
             return routeBase;
+        }
+
+        public static string GetEnv()
+        {
+            return Convert.ToString(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "").ToUpper();
         }
 
         //public static void EnvPrint()
@@ -21,10 +27,9 @@ namespace WebApiTienda.Utils
         //    // ASPNETCORE_ENVIRONMENT:                  Development
         //}
 
-
         private static void Main(string value, string type)
         {
-            string typeEnt = Convert.ToString(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "").ToUpper();
+            string typeEnt = GetEnv();
             string path = GetRoute() + type + ".log";
             string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             string valueSave = "["+ date + "] " + typeEnt + "."+ type.ToUpper() +": " + value;
@@ -43,51 +48,39 @@ namespace WebApiTienda.Utils
 
         }
 
-        public static void Alert(string value, bool saveDB)
+        public static void Alert(string value)
         {
-            if (saveDB)
-            {
-                
-            } else
-            {
-                Main(value, "alert");
-            }
-
-        }
-        public static void Error(string value, bool saveDB)
-        {
-            if (saveDB)
-            {
-                
-            } else
-            {
-                Main(value, "error");
-            }
-
+            Main(value, "alert");
         }
 
-        public static void Warning(string value, bool saveDB)
+        public static void Error(string value)
         {
-            if (saveDB)
-            {
-                
-            } else
-            {
-                Main(value, "warning");
-            }
-
+            Main(value, "error");
         }
 
-        public static void Info(string value, bool saveDB)
+        public static void Warning(string value)
         {
-            if (saveDB)
-            {
-                
-            } else
-            {
-                Main(value, "info");
-            }
+            Main(value, "warning");
+        }
 
+        public static void Info(string value)
+        {
+            Main(value, "info");
+        }
+
+        public static LogsModel CreateLog(string mensaje, int idUser, string tipoLog, string data, string evento)
+        {
+            if (tipoLog == null || tipoLog == "") { tipoLog = "info"; }
+
+            LogsModel log = new LogsModel(){ 
+                Mensaje = mensaje,
+                Tipo = tipoLog,
+                IdUser = idUser,
+                Data = data,
+                Evento = evento
+            };
+
+            return log;
         }
 
     }

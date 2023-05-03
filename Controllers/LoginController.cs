@@ -10,7 +10,7 @@ namespace WebApiTienda.Controllers
     {
         private readonly AppContextDB _context;
 
-        public LoginController(AppContextDB context, IConfiguration config)
+        public LoginController(AppContextDB context)
         {
             _context = context;
         }

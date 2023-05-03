@@ -94,7 +94,11 @@ namespace WebApiTienda.Controllers
         {
             Token TokenUtil = new Token(Request.Headers, HttpContext);
             var dataToken = TokenUtil.GetDataToken();
-            Logs.Warning("Tratando de borrar el id " + id, false);
+
+            string messageLog = "Tratando de borrar el id " + id;
+            Logs.Warning(messageLog);
+            _context.LogDb.Add(Logs.CreateLog(messageLog, dataToken.userId, "", "", ""));
+            await _context.SaveChangesAsync();
 
             if (TokenUtil.ValidarOrigen(dataToken.aud) == false)
             {
