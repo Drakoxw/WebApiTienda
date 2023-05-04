@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebApiTienda.Utils;
 using WebApiTienda.Models;
-using WebApiTienda.Models.Interfaces;
+using WebApiTienda.Models.DTOs;
 
 namespace WebApiTienda.Controllers
 {

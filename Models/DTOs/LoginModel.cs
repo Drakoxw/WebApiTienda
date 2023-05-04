@@ -1,4 +1,4 @@
-﻿namespace WebApiTienda.Models
+﻿namespace WebApiTienda.Models.DTOs
 {
     public class LoginModel
     {

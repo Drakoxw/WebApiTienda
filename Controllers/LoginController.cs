@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebApiTienda.Models;
+using WebApiTienda.Models.DTOs;
 using WebApiTienda.Utils;
 
 namespace WebApiTienda.Controllers

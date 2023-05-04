@@ -1,4 +1,4 @@
-﻿namespace WebApiTienda.Models.Interfaces
+﻿namespace WebApiTienda.Models.DTOs
 {
     public class VentaInterface
     {
