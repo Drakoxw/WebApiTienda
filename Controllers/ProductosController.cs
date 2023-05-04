@@ -28,7 +28,7 @@ namespace WebApiTienda.Controllers
                 return NoContent();
             }
 
-            return new ResponseApi<List<ProductosModel>>(list, "ok", "Created");
+            return new ResponseApi<List<ProductosModel>>(list, "ok", "Data found");
         }
 
         [HttpPost]
@@ -45,7 +45,7 @@ namespace WebApiTienda.Controllers
 
                 var descrp = new SqlParameter("@descripcion", produc.Descripcion);
                 var precio = new SqlParameter("@precio", produc.Precio);
-                var res = _context.Productos.FromSqlRaw(
+                _context.Productos.FromSqlRaw(
                     "exec insertarProducto @descripcion, @precio",
                     descrp, precio
                 ).ToList();
@@ -55,7 +55,7 @@ namespace WebApiTienda.Controllers
             }
             catch (Exception e)
             {
-                if (e.ToString().Contains("The required column 'Id'"))
+                if (e.Message.Contains("The required column 'Id'"))
                 {
                     return StatusCode(201, new ResponseApi<ProductosModel>(produc, "ok", "Created"));
                 }

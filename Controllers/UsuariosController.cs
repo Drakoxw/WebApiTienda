@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WebApiTienda.Models;
-using WebApiTienda.Models.Interfaces;
 using WebApiTienda.Utils;
 
 namespace WebApiTienda.Controllers

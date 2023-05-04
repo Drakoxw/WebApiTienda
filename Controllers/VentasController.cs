@@ -9,6 +9,7 @@ namespace WebApiTienda.Controllers
 {
     [Route("api/ventas")]
     [ApiController]
+    [Authorize]
     public class VentasController : ControllerBase
     {
         private readonly AppContextDB _context;
@@ -21,20 +22,20 @@ namespace WebApiTienda.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VentasModel>>> GetVentas()
         {
-          if (_context.Ventas == null)
-          {
-              return NotFound();
-          }
+            if (_context.Ventas == null)
+            {
+                return NotFound();
+            }
             return await _context.Ventas.ToListAsync();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<VentasModel>> GetVentasModel(int id)
         {
-          if (_context.Ventas == null)
-          {
-              return NotFound();
-          }
+            if (_context.Ventas == null)
+            {
+                return NotFound();
+            }
             var ventasModel = await _context.Ventas.FindAsync(id);
 
             if (ventasModel == null)
@@ -57,16 +58,16 @@ namespace WebApiTienda.Controllers
 
             var data = (from A in _context.ItemVenta
                         join B in _context.Productos on A.ProductoId equals B.Id
-                              where A.VentaId == id
-                              select  new {
-                                  ventaId = A.VentaId,
-                                  itemId = A.Id,
-                                  productoId = A.ProductoId,
-                                  descProduct = B.Descripcion,
-                                  numeroItems = A.NumeroItems,
-                                  precio = B.Precio,
-                                  total = A.NumeroItems * B.Precio
-                              }).Take(100);
+                        where A.VentaId == id
+                        select new {
+                            ventaId = A.VentaId,
+                            itemId = A.Id,
+                            productoId = A.ProductoId,
+                            descProduct = B.Descripcion,
+                            numeroItems = A.NumeroItems,
+                            precio = B.Precio,
+                            total = A.NumeroItems * B.Precio
+                        }).Take(100);
 
             if (data.Count() > 0)
             {
@@ -79,7 +80,6 @@ namespace WebApiTienda.Controllers
 
 
         [HttpPost]
-        [Authorize]
         public async Task<ActionResult<ResponseApi<string>>> PostVentasModel(VentaInterface ventaNeta)
         {
             VentasModel venta = new VentasModel
@@ -106,7 +106,6 @@ namespace WebApiTienda.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
         public async Task<IActionResult> DeleteVentasModel(int id)
         {
             Token TokenUtil = new Token(Request.Headers, HttpContext);
