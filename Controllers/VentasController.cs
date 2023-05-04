@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApiTienda.Utils;
 using WebApiTienda.Models;
 using WebApiTienda.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebApiTienda.Controllers
 {
@@ -44,38 +45,41 @@ namespace WebApiTienda.Controllers
             return ventasModel;
         }
 
-       
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutVentasModel(int id, VentasModel ventasModel)
+        [HttpGet("fullData/{id}")]
+        public async Task<ActionResult<ResponseApi<List<VentasFullData>>>> GetVentasModelFull(int id)
         {
-            if (id != ventasModel.Id)
+            var ventasModel = await _context.Ventas.FindAsync(id);
+
+            if (ventasModel == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(ventasModel).State = EntityState.Modified;
+            var data = (from A in _context.ItemVenta
+                        join B in _context.Productos on A.ProductoId equals B.Id
+                              where A.VentaId == id
+                              select  new {
+                                  ventaId = A.VentaId,
+                                  itemId = A.Id,
+                                  productoId = A.ProductoId,
+                                  descProduct = B.Descripcion,
+                                  numeroItems = A.NumeroItems,
+                                  precio = B.Precio,
+                                  total = A.NumeroItems * B.Precio
+                              }).Take(100);
 
-            try
+            if (data.Count() > 0)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!VentasModelExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return StatusCode(200, new ResponseApi<IQueryable>(data, "ok", "data found"));
             }
 
             return NoContent();
+
         }
 
-    
+
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<ResponseApi<string>>> PostVentasModel(VentaInterface ventaNeta)
         {
             VentasModel venta = new VentasModel
@@ -102,12 +106,22 @@ namespace WebApiTienda.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteVentasModel(int id)
         {
-            if (_context.Ventas == null)
+            Token TokenUtil = new Token(Request.Headers, HttpContext);
+            var dataToken = TokenUtil.GetDataToken();
+
+            if (TokenUtil.ValidarOrigen(dataToken.aud) == false)
             {
-                return NotFound();
+                return StatusCode(401, new ResponseApi<string>("", "error", "Origen de token desconocido"));
             }
+
+            if (dataToken.isAdmin == false)
+            {
+                return StatusCode(403, new ResponseApi<string>(dataToken.role, "error", "No autorizado"));
+            }
+
             var ventasModel = await _context.Ventas.FindAsync(id);
             if (ventasModel == null)
             {
