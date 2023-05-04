@@ -10,6 +10,8 @@ namespace WebApiTienda.Models
         public DbSet<ProductosModel> Productos { get; set; }
         public DbSet<UsuariosModel> Usuarios { get; set; }
         public DbSet<LogsModel> LogDb { get; set; }
+        public DbSet<VentasModel> Ventas { get; set; }
+        public DbSet<ItemVenta> ItemVenta { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{

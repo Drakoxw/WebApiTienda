@@ -12,8 +12,8 @@ using WebApiTienda.Models;
 namespace WebApiTienda.Migrations
 {
     [DbContext(typeof(AppContextDB))]
-    [Migration("20230503083749_Logs3")]
-    partial class Logs3
+    [Migration("20230504014351_Ventas3")]
+    partial class Ventas3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,10 +46,8 @@ namespace WebApiTienda.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Fecha")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("IdUser")
                         .HasColumnType("int");
@@ -122,6 +120,41 @@ namespace WebApiTienda.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("WebApiTienda.Models.VentasModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.ToTable("Ventas");
+                });
+
+            modelBuilder.Entity("WebApiTienda.Models.VentasModel", b =>
+                {
+                    b.HasOne("WebApiTienda.Models.UsuariosModel", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using WebApiTienda.Models;
 namespace WebApiTienda.Migrations
 {
     [DbContext(typeof(AppContextDB))]
-    [Migration("20230503084903_Logs4")]
-    partial class Logs4
+    [Migration("20230503100048_Ventas2")]
+    partial class Ventas2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -120,6 +120,51 @@ namespace WebApiTienda.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Usuarios");
+                });
+
+            modelBuilder.Entity("WebApiTienda.Models.VentasModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClienteId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ProductoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClienteId");
+
+                    b.HasIndex("ProductoId");
+
+                    b.ToTable("Ventas");
+                });
+
+            modelBuilder.Entity("WebApiTienda.Models.VentasModel", b =>
+                {
+                    b.HasOne("WebApiTienda.Models.UsuariosModel", "Cliente")
+                        .WithMany()
+                        .HasForeignKey("ClienteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WebApiTienda.Models.ProductosModel", "Producto")
+                        .WithMany()
+                        .HasForeignKey("ProductoId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Cliente");
+
+                    b.Navigation("Producto");
                 });
 #pragma warning restore 612, 618
         }
